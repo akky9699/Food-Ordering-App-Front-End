@@ -39,7 +39,295 @@ const styles = {
 
 
 class Header extends Component {
-  
+  state = {
+    username: "",
+    modalOpen: false,
+    value: 0,
+    isLoggedIn: false,
+    renderProfileMenu: false,
+    anchorEl: null,
+    contactNumber: null,
+    password: null,
+    loginPasswordErrorDisplay: "none",
+    loginContactErrorDisplay: "none",
+    invalidErrorDisplay: "none",
+    serverErrorDisplay: "none",
+    errorMessage: "Required",
+    firstName: null,
+    lastName: null,
+    email: null,
+    signUpContactNumber: null,
+    signUpPassword: null,
+    firstNameErrorDisplay: "none",
+    emailErrorDisplay: "none",
+    passwordErrorDisplay: "none",
+    contactErrorDisplay: "none",
+    snack_open : false,
+    snack_msg : null
+  };
+
+  // Login related methods to set data in state
+  setContactNumberLogin = event => {
+    this.setState({
+      contactNumber: event.target.value
+    });
+    console.log(this.state.contactNumber);
+  };
+
+  setPasswordLogin = event => {
+    const base64EncodedPassword = btoa(event.target.value);
+    this.setState({
+      password: event.target.value
+    });
+    console.log(this.state.password);
+  };
+
+  // Function to encode credentials in base64
+  encodeBase64Login = str => {
+    const base64EncodedAuth = btoa(str);
+    return base64EncodedAuth;
+  };
+
+  // Sign up related function to set data in state
+  setFirstName = event => {
+    this.setState({
+      firstName: event.target.value
+    });
+    console.log(this.state.firstName);
+  };
+
+  setLastName = event => {
+    this.setState({
+      lastName: event.target.value
+    });
+    console.log(this.state.lastName);
+  };
+
+  setEmail = event => {
+    this.setState({
+      email: event.target.value
+    });
+    console.log(this.state.email);
+  };
+
+  setSignUpPassword = event => {
+    this.setState({
+      signUpPassword: event.target.value
+    });
+    console.log(this.state.signUpPassword);
+  };
+
+  setSignUpContactNumber = event => {
+    this.setState({
+      signUpContactNumber: event.target.value
+    });
+    console.log(this.state.signUpContactNumber);
+  };
+
+  handleOpenModal = () => {
+    this.setState({ modalOpen: true });
+  };
+
+  handleCloseModal = () => {
+    this.setState({ modalOpen: false });
+  };
+
+  handleChange = (event, value) => {
+    this.setState({ value });
+  };
+
+  postData = async () => {
+    const contactNumber = this.state.contactNumber;
+    const password = this.state.password;
+    const stringToEncode = contactNumber + ":" + password;
+    const encodedAuth = btoa(stringToEncode);
+
+    const postAddress_api_call = await fetch(
+      "http://localhost:8080/api/customer/login",
+      {
+        method: "POST",
+        headers: {
+          authorization: "Basic " + encodedAuth,
+          "content-type": "application/json;charset=UTF-8"
+        }
+      }
+    );
+
+    const responseData = await postAddress_api_call.json();
+
+    if (postAddress_api_call.status === 200) {
+      const accessToken = postAddress_api_call.headers.get("access-token");
+      const user = responseData.first_name;
+      sessionStorage.setItem("access-token", accessToken);
+      this.setState({
+        username: user,
+        isLoggedIn: true,
+        snack_open: true,
+        snack_msg:"Logged in successfully"
+      });
+    } else if (postAddress_api_call.status === 401) {
+      const error = responseData.message;
+      this.setState({
+        serverErrorDisplay: "flex",
+        errorMessage: error
+      });
+      return false;
+    } else {
+      // implement errors here
+      const error = responseData.message;
+    }
+  };
+
+  postSignUpData = async () => {
+    const firstName = this.state.firstName;
+    const lastName = this.state.lastName;
+    const email = this.state.email;
+    const password = this.state.signUpPassword;
+    const contactNumber = this.state.signUpContactNumber;
+
+    const data = {
+      contact_number: contactNumber,
+      email_address: email,
+      first_name: firstName,
+      last_name: lastName,
+      password: password
+    };
+
+    const postAddress_api_call = await fetch(
+      "http://localhost:8080/api/customer/signup",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json;charset=UTF-8"
+        },
+        body: JSON.stringify(data)
+      }
+    );
+
+    const responseData = await postAddress_api_call.json();
+
+    if (postAddress_api_call.status !== 201) {
+      const error = responseData.message;
+      if(responseData.code === "SGR-002"){
+        this.setState({
+          emailErrorDisplay: "flex",
+          errorMessage: error
+        });
+      }else{
+        this.setState({
+          contactErrorDisplay: "flex",
+          errorMessage: error
+        });
+      }
+
+
+    } else if (postAddress_api_call.status === 201) {
+      this.setState({
+        contactErrorDisplay: "flex",
+        errorMessage: null,
+        snack_open: true,
+        snack_msg:"Registered successfully! Please Login Now",
+        value: 0
+      });
+    }
+  };
+
+  handleLogin = async () => {
+    const contactNumber = this.state.contactNumber;
+    const password = this.state.password;
+
+    this.setState({
+      loginPasswordErrorDisplay: "none",
+      loginContactErrorDisplay: "none",
+      invalidErrorDisplay: "none",
+      serverErrorDisplay: "none",
+      errorMessage: "Required",
+      signUpErrorMessage: "Required"
+    });
+
+    if (contactNumber === null && password === null) {
+      this.setState({
+        loginPasswordErrorDisplay: "flex",
+        loginContactErrorDisplay: "flex"
+      });
+    } else if (contactNumber === null) {
+      this.setState({
+        loginContactErrorDisplay: "flex"
+      });
+    } else if (contactNumber.length < 9) {
+      this.setState({
+        invalidErrorDisplay: "flex",
+        errorMessage: "Invalid contact"
+      });
+    } else if (password === null) {
+      this.setState({
+        loginPasswordErrorDisplay: "flex"
+      });
+    } else {
+      const response = await this.postData();
+      if (response === false) {
+        console.log("error");
+      } else {
+        this.setState({
+          isLoggedIn: true
+        });
+        this.handleCloseModal();
+      }
+    }
+  };
+
+  handleLogout = () => {
+    this.setState({ isLoggedIn: false, username: "" });
+    window.sessionStorage.removeItem("access-token");
+  };
+
+  handleSignUp = () => {
+    const firstName = this.state.firstName;
+    const lastName = this.state.lastName;
+    const email = this.state.email;
+    const password = this.state.signUpPassword;
+    const contactNumber = this.state.signUpContactNumber;
+
+    this.setState({
+      firstNameErrorDisplay: "none",
+      emailErrorDisplay: "none",
+      passwordErrorDisplay: "none",
+      contactErrorDisplay: "none",
+      errorMessage: "Required"
+    });
+
+    if (
+      firstName === null &&
+      email === null &&
+      password === null &&
+      contactNumber === null
+    ) {
+      this.setState({
+        firstNameErrorDisplay: "flex",
+        emailErrorDisplay: "flex",
+        passwordErrorDisplay: "flex",
+        contactErrorDisplay: "flex"
+      });
+    } else if (
+      firstName !== null &&
+      email !== null &&
+      password !== null &&
+      contactNumber !== null
+    ) {
+      this.postSignUpData();
+    }
+  };
+
+  handleOpenProfileMenu = event => {
+    this.setState({ renderProfileMenu: true });
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleCloseProfileMenu = () => {
+    this.setState({ renderProfileMenu: false });
+    this.setState({ anchorEl: null });
+  };
+
   render() {
     const { classes } = this.props;
     const { value } = this.state;
@@ -81,14 +369,14 @@ class Header extends Component {
               ) : null}
               <Grid item>
                 {!window.sessionStorage.getItem("access-token") ? (
-                  <div>
+                  <div className="logged_menu" >
                     <Button variant="contained" onClick={this.handleOpenModal}>
                       <AccountCircle style={{ marginRight: "5px" }} />
                       Login
                     </Button>
                   </div>
                 ) : (
-                  <div>
+                  <div className="logged_menu" >
                     <Button
                       className="btn-profile"
                       onClick={this.handleOpenProfileMenu}

@@ -2,6 +2,10 @@
   background: rgb(37, 50, 56) !important;
 }
 
+.navbar-brand{
+  font-size: 30px !important;
+}
+
 .search-bar-container {
   position: "relative";
   display: inline-flex;
@@ -52,4 +56,17 @@
 .menu-item {
   font-size: 15px !important;
   margin: 0 !important;
+}
+
+@media screen and (max-width: 600px) {
+  .search-bar-container{
+    margin-left: 0 !important;
+  }
+  .navbar-brand{
+    font-size: 30px !important;
+  }
+  .logged_menu{
+    padding-bottom: 6%;
+  }
+
 }
