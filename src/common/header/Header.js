@@ -1,0 +1,341 @@
+// imports
+import React, { Component } from "react";
+import { withStyles, withTheme } from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Modal from "@material-ui/core/Modal";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import FormControl from "@material-ui/core/FormControl";
+import Input from "@material-ui/core/Input";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import SearchIcon from "@material-ui/icons/Search";
+import FastFood from "@material-ui/icons/Fastfood";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import Grid from "@material-ui/core/Grid";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import "./Header.css";
+import { Button, InputAdornment } from "@material-ui/core";
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles } from '@material-ui/core/styles';
+
+function TabContainer(props) {
+  return <div className="tab-container">{props.children}</div>;
+}
+
+const styles = {
+  underline: {
+    "&:after": {
+      height: "2px",
+      backgroundColor: "white"
+    }
+  }
+};
+
+
+class Header extends Component {
+  
+  render() {
+    const { classes } = this.props;
+    const { value } = this.state;
+    const open = Boolean(this.state.anchorEl);
+    // const classes_style = useStyles();
+    // const [open_check, setOpen] = React.useState(false);
+
+    return (
+      <div className="header-container">
+        <AppBar className="navbar" position="static">
+          <Toolbar>
+            <Grid
+              justify="space-between" // Add it here :)
+              container
+              style={{ alignItems: "center" }}
+              spacing={24}
+            >
+              <Grid item>
+                <FastFood className="navbar-brand" />
+              </Grid>
+              {!window.sessionStorage.getItem("access-token") ? (
+                <Grid item>
+                  <div className="search-bar-container">
+                    <Input
+                      classes={{
+                        underline: classes.underline
+                      }}
+                      className="search-bar"
+                      fullWidth={true}
+                      placeholder="Search by Restaurant Name"
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      }
+                    />
+                  </div>
+                </Grid>
+              ) : null}
+              <Grid item>
+                {!window.sessionStorage.getItem("access-token") ? (
+                  <div>
+                    <Button variant="contained" onClick={this.handleOpenModal}>
+                      <AccountCircle style={{ marginRight: "5px" }} />
+                      Login
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Button
+                      className="btn-profile"
+                      onClick={this.handleOpenProfileMenu}
+                    >
+                      <AccountCircle
+                        style={{ marginRight: "5px" }}
+                        className="btn-profile"
+                      />
+                      {this.state.username}
+                    </Button>
+                    <Menu
+                      className="my-menu"
+                      id="menu-appbar"
+                      anchorEl={this.state.anchorEl}
+                      children="menu-list"
+                      getContentAnchorEl={null}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center"
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "center"
+                      }}
+                      open={open}
+                      onClose={this.handleCloseProfileMenu}
+                    >
+                      {this.state.renderProfileMenu ? (
+                        <div className="menu-item-container">
+                          <MenuList id="menu-list">
+                            <MenuItem className="menu-item">
+                              My Profile
+                            </MenuItem>
+                            <MenuItem
+                              className="menu-item"
+                              onClick={this.handleLogout}
+                            >
+                              Logout
+                            </MenuItem>
+                          </MenuList>
+                        </div>
+                      ) : null}
+                    </Menu>
+                  </div>
+                )}
+              </Grid>
+            </Grid>
+          </Toolbar>
+        </AppBar>
+        <Modal
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+          className="header-modal"
+          open={this.state.modalOpen}
+          onClose={this.handleCloseModal}
+        >
+          <div className="modal-container">
+            <Tabs value={value} onChange={this.handleChange}>
+              <Tab label="Login" />
+              <Tab label="Signup" />
+            </Tabs>
+            {value === 0 && (
+              <TabContainer>
+                <FormControl className="login-form">
+                  <Input
+                    fullWidth={true}
+                    placeholder="Contact No.*"
+                    onChange={this.setContactNumberLogin}
+                    aria-describedby="contact-error-text"
+                  />
+                  <FormHelperText
+                    id="contact-error-text"
+                    style={{
+                      display: this.state.loginContactErrorDisplay,
+                      color: "red"
+                    }}
+                  >
+                    {this.state.errorMessage}
+                  </FormHelperText>
+                  <FormHelperText
+                    id="invalid-error-text"
+                    style={{
+                      display: this.state.invalidErrorDisplay,
+                      color: "red"
+                    }}
+                  >
+                    {this.state.errorMessage}
+                  </FormHelperText>
+                  <div style={{ marginBottom: "10%" }}>
+                    <Input
+                      fullWidth={true}
+                      placeholder="Password*"
+                      id="passInput"
+                      type="password"
+                      style={{ marginTop: "10%" }}
+                      onChange={this.setPasswordLogin}
+                      aria-describedby="password-error-text"
+                    />
+                    <FormHelperText
+                      id="password-error-text"
+                      style={{
+                        display: this.state.loginPasswordErrorDisplay,
+                        color: "red"
+                      }}
+                    >
+                      {this.state.errorMessage}
+                    </FormHelperText>
+                    <FormHelperText
+                      id="server-error-text"
+                      style={{
+                        display: this.state.serverErrorDisplay,
+                        color: "red",
+                        marginTop: "10%"
+                      }}
+                    >
+                      {this.state.errorMessage}
+                    </FormHelperText>
+                  </div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className="btn-login"
+                    style={{ marginTop: "20%" }}
+                    onClick={this.handleLogin}
+                  >
+                    Login
+                  </Button>
+                </FormControl>
+              </TabContainer>
+            )}
+            {value === 1 && (
+              <TabContainer>
+                <FormControl className="login-form">
+                  <Input
+                    fullWidth={true}
+                    placeholder="First Name *"
+                    onChange={this.setFirstName}
+                    aria-describedby="firstname-error-text"
+                  />
+                  <FormHelperText
+                    id="firstname-error-text"
+                    style={{
+                      display: this.state.firstNameErrorDisplay,
+                      color: "red"
+                    }}
+                  >
+                    {this.state.errorMessage}
+                  </FormHelperText>
+                  <Input
+                    fullWidth={true}
+                    placeholder="Last Name"
+                    id="passInput"
+                    style={{ marginTop: "10%" }}
+                    onChange={this.setLastName}
+                  />
+                  <Input
+                    fullWidth={true}
+                    placeholder="Email *"
+                    id="passInput"
+                    style={{ marginTop: "10%" }}
+                    onChange={this.setEmail}
+                    aria-describedby="email-error-text"
+                  />
+                  <FormHelperText
+                    id="email-error-text"
+                    style={{
+                      display: this.state.emailErrorDisplay,
+                      color: "red"
+                    }}
+                  >
+                    {this.state.errorMessage}
+                  </FormHelperText>
+                  <Input
+                    fullWidth={true}
+                    placeholder="Password *"
+                    id="passInput"
+                    style={{ marginTop: "10%" }}
+                    onChange={this.setSignUpPassword}
+                    aria-describedby="signuppassword-error-text"
+                  />
+                  <FormHelperText
+                    id="signuppassword-error-text"
+                    style={{
+                      display: this.state.passwordErrorDisplay,
+                      color: "red"
+                    }}
+                  >
+                    {this.state.errorMessage}
+                  </FormHelperText>
+                  <div style={{ marginTop: "10%", marginBottom: "10%" }}>
+                    <Input
+                      fullWidth={true}
+                      placeholder="Contact No. *"
+                      id="passInput"
+                      onChange={this.setSignUpContactNumber}
+                      aria-describedby="signupcontact-error-text"
+                    />
+                    <FormHelperText
+                      id="signupcontact-error-text"
+                      style={{
+                        display: this.state.contactErrorDisplay,
+                        color: "red",
+                        marginBottom: "10%"
+                      }}
+                    >
+                      {this.state.errorMessage}
+                    </FormHelperText>
+                  </div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className="btn-login"
+                    style={{ marginTop: "30%" }}
+                    onClick={this.handleSignUp}
+                  >
+                    Signup
+                  </Button>
+                </FormControl>
+              </TabContainer>
+            )}
+          </div>
+        </Modal>
+
+        <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={this.state.snack_open}
+        autoHideDuration={6000}
+        onClose={this.handleClose}
+        ContentProps={{
+          'aria-describedby': 'message-id',
+        }}
+        message={<span id="message-id">{this.state.snack_msg}</span>}
+      />
+
+
+
+      </div>
+      
+      
+
+
+    );
+  }
+}
+
+// export
+export default withStyles(styles)(Header);
