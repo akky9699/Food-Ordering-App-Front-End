@@ -30,7 +30,25 @@ class Controller extends Component {
             render={props => <Profile {...props} baseUrl={this.baseUrl} />}
           />
         
-    
+          <Route
+            path="/checkout"
+            render={props =>
+              sessionStorage.getItem("customer-cart") === null ? (
+                <Redirect to="/" />
+              ) : (
+                <Route
+                  path="/checkout"
+                  render={props => (
+                    <Checkout
+                      {...props}
+                      component={Checkout}
+                      baseUrl={this.baseUrl}
+                    />
+                  )}
+                />
+              )
+            }
+          />
         </div>
       </Router>
     );
