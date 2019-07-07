@@ -66,7 +66,8 @@ class Home extends Component {
     }
 
     componentWillMount() {
-       
+        // clear existing cart
+        sessionStorage.removeItem('customer-cart');
     
         // get restaurants from api
         let that = this;
@@ -82,9 +83,44 @@ class Home extends Component {
         xhrRestaurants.open('GET', `${this.props.baseUrl}/restaurant`);
         xhrRestaurants.send(dataRestaurants);
 
+        this.updateCardsGridListCols();
     }
 
+    componentDidMount() {
+        window.addEventListener('resize', this.updateCardsGridListCols);
+    }
 
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateCardsGridListCols);
+    }
+
+    updateCardsGridListCols = () => {
+        if (window.innerWidth >= 1530) {
+            this.setState({ cards: 5 });
+            return;
+        }
+
+        if (window.innerWidth >= 1270) {
+            this.setState({ cards: 4 });
+            return;
+        }
+
+        if (window.innerWidth >= 1000) {
+            this.setState({ cards: 3 });
+            return;
+        }
+
+        if (window.innerWidth >= 500) {
+            this.setState({ cards: 2 });
+            return;
+        }
+
+        this.setState({ cards: 1 })
+    }
+
+    restaurantCardTileOnClickHandler = (restaurantId) => {
+        this.props.history.push('/restaurant/' + restaurantId);
+    }
 
     searchHandler = (query) => {
         let that = this;
