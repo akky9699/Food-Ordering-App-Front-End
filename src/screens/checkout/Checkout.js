@@ -19,7 +19,20 @@ import GridListTile from "@material-ui/core/GridListTile";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
-
+import FormLabel from "@material-ui/core/FormLabel";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import InputLabel from "@material-ui/core/InputLabel";
+import Input from "@material-ui/core/Input";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Divider from "@material-ui/core/Divider";
+import Snackbar from "@material-ui/core/Snackbar";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
 const styles = theme => ({
   stepperButton: {
@@ -142,6 +155,57 @@ class Checkout extends Component {
   preState = {
     activeStep: 0
   };
+
+  componentWillMount() {
+    let that = this;
+
+    // customer existing address
+    let dataCustomerAddress = null;
+    let xhrCustomerAddress = new XMLHttpRequest();
+    xhrCustomerAddress.addEventListener("readystatechange", function() {
+      if (this.readyState === 4) {
+        that.setState({
+          customerExistingAddresses: JSON.parse(this.responseText).addresses
+        });
+      }
+    });
+    xhrCustomerAddress.open("GET", `${this.props.baseUrl}/address/customer`);
+    xhrCustomerAddress.setRequestHeader(
+      "authorization",
+      "Bearer " + sessionStorage.getItem("access-token")
+    );
+    xhrCustomerAddress.send(dataCustomerAddress);
+
+    // states request
+    let dataStates = null;
+    let xhrStates = new XMLHttpRequest();
+    xhrStates.addEventListener("readystatechange", function() {
+      if (this.readyState === 4) {
+        that.setState({
+          states: JSON.parse(this.responseText).states
+        });
+      }
+    });
+    xhrStates.open("GET", `${this.props.baseUrl}/states`);
+    xhrStates.send(dataStates);
+
+    // payment modes request
+    let dataPaymentModes = null;
+    let xhrPaymentModes = new XMLHttpRequest();
+    xhrPaymentModes.addEventListener("readystatechange", function() {
+      if (this.readyState === 4) {
+        that.setState({
+          paymentModes: JSON.parse(this.responseText).paymentMethods
+        });
+      }
+    });
+    xhrPaymentModes.open("GET", `${this.props.baseUrl}/payment`);
+    xhrPaymentModes.send(dataPaymentModes);
+  }
+
+  componentWillUnmount() {
+    sessionStorage.removeItem("customer-cart");
+  }
 
   stepperNextHandler = () => {
     // do not increment step if address is not selected
@@ -286,7 +350,37 @@ class Checkout extends Component {
       pincode: this.state.pincode,
       state_uuid: stateUUID
     };
-
+    let xhrNewAddress = new XMLHttpRequest();
+    xhrNewAddress.addEventListener("readystatechange", function() {
+      if (this.readyState === 4) {
+        let dataCustomerAddress = null;
+        let xhrCustomerAddress = new XMLHttpRequest();
+        xhrCustomerAddress.addEventListener("readystatechange", function() {
+          if (this.readyState === 4) {
+            that.setState({
+              customerExistingAddresses: JSON.parse(this.responseText).addresses
+            });
+            that.setState({tabValue:0})
+          }
+        });
+        xhrCustomerAddress.open(
+          "GET",
+          `${that.props.baseUrl}/address/customer`
+        );
+        xhrCustomerAddress.setRequestHeader(
+          "authorization",
+          "Bearer " + sessionStorage.getItem("access-token")
+        );
+        xhrCustomerAddress.send(dataCustomerAddress);
+      }
+    });
+    xhrNewAddress.open("POST", `${this.props.baseUrl}/address`);
+    xhrNewAddress.setRequestHeader(
+      "authorization",
+      "Bearer " + sessionStorage.getItem("access-token")
+    );
+    xhrNewAddress.setRequestHeader("Content-Type", "application/json");
+    xhrNewAddress.send(JSON.stringify(dataNewAddress));
   };
 
   radioChangeHandler = event => {
