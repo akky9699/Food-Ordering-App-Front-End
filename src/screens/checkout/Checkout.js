@@ -360,6 +360,7 @@ class Checkout extends Component {
             that.setState({
               customerExistingAddresses: JSON.parse(this.responseText).addresses
             });
+            that.setState({tabValue:0})
           }
         });
         xhrCustomerAddress.open(

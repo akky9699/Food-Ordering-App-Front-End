@@ -160,11 +160,3 @@
         flex: none !important;
     }
   }
-
-  @media screen and (min-width:600px) and (max-width: 1024px) {
-    .detailed_text{
-        padding-left: 7% !important;
-      }
-  }
-
- 

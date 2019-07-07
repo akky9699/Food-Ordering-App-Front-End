@@ -284,7 +284,7 @@ class Details extends Component {
       <div>
         <Header />
         <div>
-          <Grid container spacing={40} className="bggrey mobile-text-center">
+          <Grid container spacing={24} className="bggrey mobile-text-center">
             <Grid item xs={12} sm={3} className="text-center">
               <img
                 src={photo_URL}
@@ -294,7 +294,7 @@ class Details extends Component {
                 className="margin-top-20"
               />
             </Grid>
-            <Grid item xs={12} sm={9} className="detailed_text">
+            <Grid item xs={12} sm={9}>
               <Grid container spacing={24}>
                 <Grid item xs={12} sm={12} className="font-family-serif">
                   <h1>{restaurant_name}</h1>

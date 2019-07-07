@@ -110,7 +110,8 @@ class Home extends Component {
             return;
         }
 
-        if (window.innerWidth >= 700) {
+   
+        if (window.innerWidth >= 500) {
             this.setState({ cards: 2 });
             return;
         }
