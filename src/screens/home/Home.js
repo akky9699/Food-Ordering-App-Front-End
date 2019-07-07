@@ -110,12 +110,12 @@ class Home extends Component {
             return;
         }
 
-        if (window.innerWidth >= 500) {
+        if (window.innerWidth >= 700) {
             this.setState({ cards: 2 });
             return;
         }
 
-        this.setState({ cards: 1 })
+        this.setState({ cards: 1 });
     }
 
     restaurantCardTileOnClickHandler = (restaurantId) => {

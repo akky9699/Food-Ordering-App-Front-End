@@ -103,8 +103,6 @@ class Header extends Component {
   }
 
   componentDidMount() {
-
-  
 }
   openModalHandler = () => {
     this.setState({ modalIsOpen: true });
@@ -146,6 +144,8 @@ class Header extends Component {
       this.callApiForLogin();
     }
   };
+
+  //call the login api for the signup
   callApiForLogin = () => {
     let xhrPosts = new XMLHttpRequest();
     let that = this;
@@ -184,6 +184,8 @@ class Header extends Component {
     xhrPosts.setRequestHeader("authorization", "Basic " + param);
     xhrPosts.send();
   };
+
+  //signupClickHandler will perform the validation and if the validation are passed then the signup api will be called
   signupClickHandler = () => {
     // Validate first Name ....
     this.state.firstname === ""
@@ -205,6 +207,8 @@ class Header extends Component {
       this.callApiForSignup();
     }
   };
+  
+  //callApiForSignup will make a api call to the signup api 
   callApiForSignup = () => {
     let data = {
       contact_number: this.state.contactno,
@@ -218,6 +222,7 @@ class Header extends Component {
 
     xhrPosts.addEventListener("readystatechange", function() {
       if (this.readyState === 4) {
+        //response status is 201  then the user is registered.
         if (this.status === 201) {
           that.setState({
             open: true,
@@ -243,6 +248,8 @@ class Header extends Component {
     }
     this.setState({ open: false });
   };
+
+  //emailFieldValidation will check the enetered email is valid or not.
   emailFieldValidation = () => {
     let isValidEmail = false;
     if (this.state.email === "") {
@@ -263,6 +270,8 @@ class Header extends Component {
     }
     return isValidEmail;
   };
+
+  //passwordFieldValidation will check the enetered password is valid or not.
   passwordFieldValidation = () => {
     let isValidPassword = false;
     if (this.state.password === "") {
@@ -284,6 +293,8 @@ class Header extends Component {
     }
     return isValidPassword;
   };
+
+  //contactnoFieldValidation will check the enetered contact no. is valid or not.
   contactnoFieldValidation = () => {
     let isValidContactNo = false;
     if (this.state.contactno === "") {
@@ -309,37 +320,45 @@ class Header extends Component {
     }
     return isValidContactNo;
   };
+
+// all input of the signup form are assigned to their respective state
   inputContactnoChangeHandler = e => {
     this.setState({
       contactno: e.target.value
     });
   };
+
   inputPasswordChangeHandler = e => {
     this.setState({
       password: e.target.value
     });
   };
+
   inputFirstnameChangeHandler = e => {
     this.setState({
       firstname: e.target.value
     });
   };
+
   inputLastnameChangeHandler = e => {
     this.setState({
       lastname: e.target.value
     });
   };
+
   inputEmailChangeHandler = e => {
     this.setState({
       email: e.target.value
     });
   };
+
   openMenuItemsHandler = event => {
     this.setState({
       showUserProfileDropDown: true
     });
     this.setState({ anchorEl: event.currentTarget });
   };
+
   closeMenuItemsHandler = () => {
     this.setState({
       showUserProfileDropDown: false
@@ -355,6 +374,7 @@ class Header extends Component {
     //     pathname: "/profile"
     //   });
   };
+
   logoutHandler = () => {
     this.closeMenuItemsHandler();
     this.setState({
@@ -373,6 +393,7 @@ class Header extends Component {
     this.props.searchHandler(e.target.value);
   };
 
+  //callApiForLogout will call the logout api and will unset the session token 
   callApiForLogout = () => {
     let xhrPosts = new XMLHttpRequest();
     let that = this;
