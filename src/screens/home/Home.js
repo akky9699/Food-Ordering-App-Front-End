@@ -64,6 +64,28 @@ class Home extends Component {
             cards: 2,
         }
     }
+
+    componentWillMount() {
+       
+    
+        // get restaurants from api
+        let that = this;
+        let dataRestaurants = null;
+        let xhrRestaurants = new XMLHttpRequest();
+        xhrRestaurants.addEventListener('readystatechange', function () {
+            if (this.readyState === 4) {
+                that.setState({
+                    restaurants: JSON.parse(this.responseText).restaurants
+                })
+            }
+        })
+        xhrRestaurants.open('GET', `${this.props.baseUrl}/restaurant`);
+        xhrRestaurants.send(dataRestaurants);
+
+    }
+
+
+
     searchHandler = (query) => {
         let that = this;
         let dataRestaurants = null;
@@ -100,7 +122,60 @@ class Home extends Component {
                     searchHandler={this.searchHandler}
                 />
 
-              
+                {this.state.restaurants === null ?
+                    <Typography className={classes.nullRestaurantList} variant='h6'>
+                        No restaurant with the given name.
+                    </Typography>
+                    :
+                    <GridList
+                        className={classes.restaurantCardsGridList}
+                        cols={this.state.cards}
+                        cellHeight='auto'
+                    >
+                        {this.state.restaurants.map(restaurant => (
+                            <GridListTile
+                                onClick={() => this.restaurantCardTileOnClickHandler(restaurant.id)}
+                                key={'restaurant' + restaurant.id}
+                            >
+
+                                {/* restaurant details card */}
+                                <Card className={classes.restaurantCard} style={{ textDecoration: 'none' }}>
+                                    <CardMedia
+                                        className={classes.restaurantCardMedia}
+                                        image={restaurant.photo_URL}
+                                        title={restaurant.restaurant_name}
+                                    />
+                                    <CardContent>
+
+                                        {/* restaurant name */}
+                                        <Typography className={classes.restaurantName} gutterBottom variant='h5' component='h2'>
+                                            {restaurant.restaurant_name}
+                                        </Typography>
+
+                                        {/* restaurant categories */}
+                                        <Typography variant='subtitle1'>
+                                            {restaurant.categories}
+                                        </Typography>
+
+                                        <div className={classes.ratingAvgRateDiv}>
+                                            {/* restaurant rating */}
+                                            <div className={classes.restaurantRatingDiv}>
+                                                <Typography className={classes.restaurantRatingText} variant='body2'>
+                                                    <i className="fa fa-star"></i> {restaurant.customer_rating} ({restaurant.number_customers_rated})
+                                                </Typography>
+                                            </div>
+
+                                            {/* restaurant average price */}
+                                            <Typography className={classes.restaurantAvgRateText} variant='body2'>
+                                                <i className="fa fa-inr"></i>{restaurant.average_price} for two
+                                            </Typography>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </GridListTile>
+                        ))}
+                    </GridList>
+                }
             </div>
         );
     }
