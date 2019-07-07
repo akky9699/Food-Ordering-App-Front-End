@@ -111,7 +111,9 @@
 .font-family-serif{
     font-family: serif;
 }
-
+.item-list-container{
+    padding: 2rem 4rem;
+}
 .divider-margin-10{
     margin: 10px 0px !important;
 }
